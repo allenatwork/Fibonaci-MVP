@@ -22,12 +22,17 @@ public class FibonacciPresenter implements BasePresenter, BaseModel.OnNewFiboNum
     @Override
     public void startShowListFibonacci() {
         mFibonacciView.displayListFiboNumber(mFibonacciModel.getListFibo());
-        mFibonacciModel.setOnNewFiboNumberGeneratedListenter(this);
-        mFibonacciModel.startGenerateFiboNumber();
     }
+
 
     @Override
     public void stopShowListFibonacci() {
         mFibonacciModel.stopGenerateFiboNumber();
+    }
+
+    @Override
+    public void startGenerateFiboNumber() {
+        mFibonacciModel.setOnNewFiboNumberGeneratedListenter(this);
+        mFibonacciModel.startGenerateFiboNumber();
     }
 }

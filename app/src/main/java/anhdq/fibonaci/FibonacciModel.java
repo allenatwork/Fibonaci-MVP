@@ -2,6 +2,7 @@ package anhdq.fibonaci;
 
 import android.os.AsyncTask;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
@@ -9,10 +10,11 @@ import java.util.ArrayList;
  */
 
 public class FibonacciModel implements BaseModel {
-    public static final int MAX_ITEM = 100;
-    public static final int SEED_ZERO = 0;
-    public static final int SEED_ONE = 1;
+    public static final int MAX_ITEM = 10000;
+    public static final int SEED_ZERO = 1;
+    public static final int SEED_ONE = 2;
     private ArrayList<FibonacciObject> listFibo;
+    private FibonacciGenerateTask fibonacciGenerateTask;
 
 
     BaseModel.OnNewFiboNumberGeneratedListenter onNewFiboNumberGeneratedListenter;
@@ -40,27 +42,30 @@ public class FibonacciModel implements BaseModel {
     //call task and generate
     @Override
     public void startGenerateFiboNumber() {
-        FibonacciGenerateTask.execute(listFibo);
+//        FibonacciGenerateTask.execute(listFibo);
+        fibonacciGenerateTask = new FibonacciGenerateTask();
+        fibonacciGenerateTask.execute(listFibo);
     }
 
     // Todo: cancel the task because user want to stop or the activity destroy
     @Override
     public void stopGenerateFiboNumber() {
-        FibonacciGenerateTask.cancel(true);
+
+        fibonacciGenerateTask.cancel(true);
     }
 
-    private AsyncTask<ArrayList<FibonacciObject>, FibonacciObject, Void> FibonacciGenerateTask = new AsyncTask<ArrayList<FibonacciObject>, FibonacciObject, Void>() {
+    private class FibonacciGenerateTask extends AsyncTask<ArrayList<FibonacciObject>, FibonacciObject, Void> {
 
         private FibonacciObject generateNewFiboNumberFromList(ArrayList<FibonacciObject> listNumber) {
             long startTime = System.currentTimeMillis();
             int size = listNumber.size();
             FibonacciObject fibonacciObject;
             if (size == 0) {
-                fibonacciObject = new FibonacciObject(SEED_ONE + SEED_ZERO, System.currentTimeMillis() - startTime);
+                fibonacciObject = new FibonacciObject(BigInteger.valueOf(SEED_ONE + SEED_ZERO), System.currentTimeMillis() - startTime);
             } else if (size == 1) {
-                fibonacciObject = new FibonacciObject(listNumber.get(0).getNumber() + SEED_ONE, System.currentTimeMillis() - startTime + listNumber.get(0).getTime());
+                fibonacciObject = new FibonacciObject(listNumber.get(0).getNumber().add(BigInteger.valueOf(SEED_ONE)), System.currentTimeMillis() - startTime + listNumber.get(0).getTime());
             } else {
-                fibonacciObject = new FibonacciObject(listNumber.get(size - 1).getNumber() + listNumber.get(size - 2).getNumber(), System.currentTimeMillis() - startTime + listNumber.get(size - 1).getTime());
+                fibonacciObject = new FibonacciObject(listNumber.get(size - 1).getNumber().add(listNumber.get(size - 2).getNumber()), System.currentTimeMillis() - startTime + listNumber.get(size - 1).getTime());
             }
             FibonacciModel.this.addNewFiboNumber(fibonacciObject);
             return fibonacciObject;
@@ -68,8 +73,8 @@ public class FibonacciModel implements BaseModel {
 
         @Override
         protected Void doInBackground(ArrayList<FibonacciObject>... listNumber) {
-            if (!isCancelled()) {
-                for (int i = 0; i < FibonacciModel.MAX_ITEM; i++) {
+            for (int i = 0; i < FibonacciModel.MAX_ITEM; i++) {
+                if (!isCancelled()) {
                     try {
                         Thread.sleep(400);
                     } catch (InterruptedException e) {
@@ -77,11 +82,15 @@ public class FibonacciModel implements BaseModel {
                     }
                     FibonacciObject next_fibo = generateNewFiboNumberFromList(listNumber[0]);
                     publishProgress(next_fibo);
+                } else {
+                    break;
                 }
             }
             return null;
         }
-    };
+    }
+
+    ;
 
 
 }

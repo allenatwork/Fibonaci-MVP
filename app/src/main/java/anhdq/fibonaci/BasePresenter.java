@@ -8,4 +8,6 @@ public interface BasePresenter {
     void startShowListFibonacci();
 
     void stopShowListFibonacci();
+
+    void startGenerateFiboNumber();
 }

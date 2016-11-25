@@ -4,6 +4,8 @@ import android.content.Context;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.math.BigInteger;
+
 /**
  * Created by Admin on 25-Nov-16.
  */
@@ -25,10 +27,16 @@ public class FibonacciItemView extends RelativeLayout {
 
     public void display(FibonacciObject fibonacciObject, int ind) {
         if (fibonacciObject == null) return;
+//        if (fibonacciObject.getNumber().compareTo(BigInteger.valueOf(2)) <= 0) {
+//            setVisibility(GONE);
+//            return;
+//        }
+
         number.setText(String.valueOf(fibonacciObject.getNumber()));
         time.setText(String.valueOf(fibonacciObject.getTime()) + "ms");
         index.setText(String.valueOf(ind));
-        if (fibonacciObject.getNumber() % 2 == 0) { // even
+        BigInteger remain[] = fibonacciObject.getNumber().divideAndRemainder(BigInteger.valueOf(2));
+        if (remain[1].compareTo(BigInteger.ZERO) == 0) { // even
             setBackgroundColor(getResources().getColor(R.color.even_color));
         } else { // odd
             setBackgroundColor(getResources().getColor(R.color.odd_color));
